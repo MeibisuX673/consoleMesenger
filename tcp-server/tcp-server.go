@@ -22,9 +22,15 @@ func processMessage(conns map[int]net.Conn, id int) {
 			break
 		}
 
-		id, err := getIdConn(string(message))
+		idTo, err := getIdConn(string(message))
 		if err != nil {
 			conn.Write([]byte("error format message example: id message"))
+			continue
+		}
+
+		recipient, ok := conns[idTo]
+		if !ok {
+			conn.Write([]byte("recipient not found"))
 			continue
 		}
 
@@ -35,12 +41,6 @@ func processMessage(conns map[int]net.Conn, id int) {
 		}
 
 		resultMessage := fmt.Sprintf("\nid: %d\nmessage: %s\n", id, outMessage)
-
-		recipient, ok := conns[id]
-		if !ok {
-			conn.Write([]byte("recipient not found"))
-			continue
-		}
 
 		recipient.Write([]byte(resultMessage))
 	}
