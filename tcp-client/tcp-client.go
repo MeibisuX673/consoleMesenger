@@ -3,10 +3,16 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/MeibisuX673/consoleMesenger/tcp-client/config"
+	"github.com/MeibisuX673/consoleMesenger/tcp-client/config/connection"
 	"log"
 	"net"
 	"os"
 )
+
+var Version string
+var User string
+var Date string
 
 func readConsole(
 	conn net.Conn,
@@ -33,17 +39,24 @@ func readSocket(
 	for {
 		message := make([]byte, 1024)
 		if _, err := conn.Read(message); err != nil {
-			fmt.Println("disconect")
+			printMessage("disconnect")
 			disconnect <- true
 			return
 		}
 
-		fmt.Print("\n" + string(message))
+		printMessage("\n" + string(message))
 	}
 }
 
+func printMessage(message string) {
+
+	fmt.Println(config.Flags.UseColor + message)
+}
+
 func main() {
-	conn, err := net.Dial("tcp", "127.0.0.1:8081")
+
+	connection.GetConnection()
+	conn, err := net.Dial("tcp", connection.GetConnection())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -54,6 +67,13 @@ func main() {
 	go readConsole(conn)
 	go readSocket(conn, disconnect)
 
-	<-disconnect
+	printInfo()
 
+	<-disconnect
+}
+
+func printInfo() {
+	printMessage("Version: " + Version)
+	printMessage("User: " + User)
+	printMessage("Date: " + Date)
 }
