@@ -33,3 +33,13 @@ go run tcp-client.go -color=green/-color green [address]
 
 Установленный цвет сохраняется
 
+### Сборка проекта
+
+Запуск скрипта 
+``` bash
+./build/build.sh
+```
+Чтобы просмотреть список поддерживаемых платформ запустите комманду
+``` bash
+go tool dist list
+```
