@@ -33,7 +33,7 @@ go run tcp-client.go -color=green/-color green [address]
 
 Установленный цвет сохраняется
 
-### Сборка проекта
+### Сборка исполняемого файла под os
 
 Запуск скрипта 
 ``` bash
