@@ -28,7 +28,7 @@ go run tcp-client.go [address]
 
 Пример 
 ``` bash
-go run tcp-server.go -color=green/-color green [address] 
+go run tcp-client.go -color=green/-color green [address] 
 ```
 
 Установленный цвет сохраняется
