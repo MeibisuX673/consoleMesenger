@@ -9,6 +9,10 @@ import (
 	"strings"
 )
 
+var Version string
+var User string
+var Date string
+
 func processMessage(conns map[int]net.Conn, id int) {
 
 	conn := conns[id]
@@ -82,6 +86,8 @@ func main() {
 	conns := make(map[int]net.Conn)
 	id := 0
 
+	printInfo()
+
 	for {
 		conn, err := ln.Accept()
 		if err != nil {
@@ -98,5 +104,10 @@ func main() {
 
 		id++
 	}
+}
 
+func printInfo() {
+	fmt.Println("Version: " + Version)
+	fmt.Println("User: " + User)
+	fmt.Println("Date: " + Date)
 }
