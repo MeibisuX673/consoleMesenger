@@ -1,10 +1,5 @@
 #!/bin/bash
 
-os=$2
-architecture=$3
-
-echo $os
-
 echo -e "\n Введите версию:"
 read version
 
