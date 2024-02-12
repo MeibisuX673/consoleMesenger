@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/MeibisuX673/consoleMesenger/tcp-server/beats/fileServerBeat"
 	"log"
 	"net"
 	"strconv"
@@ -81,6 +82,8 @@ func main() {
 	}
 	defer ln.Close()
 
+	fileServerBeat.CreateLog("Run Server Listening on :8081")
+
 	log.Println("Listening on :8081")
 
 	conns := make(map[int]net.Conn)
@@ -96,9 +99,13 @@ func main() {
 
 		conns[id] = conn
 
-		log.Println("New connection: ", id, "\naddress: "+conn.RemoteAddr().String())
+		fileServerBeat.CreateLog(fmt.Sprintf("New connection: %d address: %s", id, conn.RemoteAddr().String()))
 
-		conn.Write([]byte(fmt.Sprintf("your id: %d\n", id)))
+		_, err = conn.Write([]byte(fmt.Sprintf("your id: %d\n", id)))
+		if err != nil {
+			fileServerBeat.CreateLog(fmt.Sprint("error connection: ", id, "\naddress: "+conn.RemoteAddr().String()))
+
+		}
 
 		go processMessage(conns, id)
 
