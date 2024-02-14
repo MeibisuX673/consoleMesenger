@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/MeibisuX673/consoleMesenger/tcp-server/beats/fileServerBeat"
 	"log"
 	"net"
 	"strconv"
@@ -13,6 +12,29 @@ import (
 var Version string
 var User string
 var Date string
+
+var LovesPeople []string = []string{
+	"Виталя",
+	"Андрей",
+	"Семен",
+}
+
+func CheckLoveMessage(message []byte, conn net.Conn) {
+	messageString := string(message)
+
+	isLove := strings.Contains(messageString, "love")
+	if !isLove {
+		return
+	}
+
+	for _, name := range LovesPeople {
+
+		if strings.Contains(messageString, name) && isLove {
+			sendLove(conn, name)
+			break
+		}
+	}
+}
 
 func processMessage(conns map[int]net.Conn, id int) {
 
@@ -26,6 +48,8 @@ func processMessage(conns map[int]net.Conn, id int) {
 			delete(conns, id)
 			break
 		}
+
+		CheckLoveMessage(message, conn)
 
 		idTo, err := getIdConn(string(message))
 		if err != nil {
@@ -49,6 +73,25 @@ func processMessage(conns map[int]net.Conn, id int) {
 
 		recipient.Write([]byte(resultMessage))
 	}
+}
+
+func sendLove(conn net.Conn, name string) {
+	love := fmt.Sprintf(""+
+		"\t\t     lovelove\t\t            lovelove"+
+		"\n\t\t  lovelovelovelove             lovelovelovelove"+
+		"\n\t      lovelovelovelovelovelove     lovelovelovelovelovelove"+
+		"\n\t    lovelovelovelovelovelovelovelovelovelovelovelovelovelove"+
+		"\n\t    lovelovelovelovelovelovelovelovelovelovelovelovelovelove"+
+		"\n\t    lovelovelovelovelovelovel%slovelovelovelovelovelove"+
+		"\n\t      lovelovelovelovelovelovelovelovelovelovelovelovelove"+
+		"\n\t        lovelovelovelovelovelovelovelovelovelovelovelove"+
+		"\n\t          lovelovelovelovelovelovelovelovelovelovelove"+
+		"\n\t              lovelovelovelovelovelovelovelovelove"+
+		"\n\t                  lovelovelovelovelovelovelove"+
+		"\n\t                      lovelovelovelovelove"+
+		"\n\t                          lovelovelove"+
+		"\n\t                              love\n", name)
+	conn.Write([]byte(love))
 }
 
 func getMessageText(message string) (string, error) {
@@ -76,15 +119,13 @@ func getIdConn(message string) (int, error) {
 
 func main() {
 
-	ln, err := net.Listen("tcp", ":8081")
+	ln, err := net.Listen("tcp", ":8083")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer ln.Close()
 
-	fileServerBeat.CreateLog("Run Server Listening on :8081")
-
-	log.Println("Listening on :8081")
+	log.Println("Listening on :8083")
 
 	conns := make(map[int]net.Conn)
 	id := 0
@@ -99,18 +140,13 @@ func main() {
 
 		conns[id] = conn
 
-		fileServerBeat.CreateLog(fmt.Sprintf("New connection: %d address: %s", id, conn.RemoteAddr().String()))
-
-		_, err = conn.Write([]byte(fmt.Sprintf("your id: %d\n", id)))
-		if err != nil {
-			fileServerBeat.CreateLog(fmt.Sprint("error connection: ", id, "\naddress: "+conn.RemoteAddr().String()))
-
-		}
+		conn.Write([]byte(fmt.Sprintf("your id: %d\n", id)))
 
 		go processMessage(conns, id)
 
 		id++
 	}
+
 }
 
 func printInfo() {
