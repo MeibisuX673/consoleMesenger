@@ -1,0 +1,60 @@
+services:
+  elasticsearch:
+    image: elasticsearch:7.16.1
+    volumes:
+      - ./docker/config/elasticSearch/config.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - ./docker_volumes/elasticsearch/data:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: "-Xmx512m -Xms512m"
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      discovery.type: single-node
+    networks:
+      - elk
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+  logstash:
+    image: logstash:7.16.1
+    volumes:
+      - ./docker/config/logstash/config.yml:/usr/share/logstash/config/logstash.yml
+      - ./docker/config/logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      - ./docker/config/pipelines:/usr/share/logstash/config/pipelines
+    environment:
+      LS_JAVA_OPTS: "-Xmx512m -Xms512m"
+      XPACK_MONITORING_ENABLED: "false"
+    ports:
+      - "5044:5044"
+      - "5000:5000"
+      - "9600:9600"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: kibana:7.16.1
+    depends_on:
+      - elasticsearch
+    volumes:
+      - ./docker/config/kibana/config.yml:/usr/share/kibana/config/kibana.yml:ro
+    networks:
+      - elk
+    ports:
+      - "5601:5601"
+
+  beats:
+    image: elastic/filebeat:7.16.2
+    entrypoint: "filebeat -e -strict.perms=false"
+    volumes:
+      - ./docker/config/filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    user: root
+    depends_on:
+      - elasticsearch
+
+networks:
+  elk:
+    driver: bridge
