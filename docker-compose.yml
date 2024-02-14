@@ -18,11 +18,12 @@ services:
   logstash:
     image: logstash:7.16.1
     volumes:
-      - ./docker/config/logstash/config.yml:/usr/share/logstash/config/logstash.yml:ro
-      - ./docker/config/logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro
-      - ./docker/config/pipelines:/usr/share/logstash/config/pipelines:ro
+      - ./docker/config/logstash/config.yml:/usr/share/logstash/config/logstash.yml
+      - ./docker/config/logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      - ./docker/config/pipelines:/usr/share/logstash/config/pipelines
     environment:
       LS_JAVA_OPTS: "-Xmx512m -Xms512m"
+      XPACK_MONITORING_ENABLED: "false"
     ports:
       - "5044:5044"
       - "5000:5000"
@@ -47,10 +48,10 @@ services:
     image: elastic/filebeat:7.16.2
     entrypoint: "filebeat -e -strict.perms=false"
     volumes:
-      - ./docker/config/filebeat/config.yml:/usr/share/filebeat/filebeat.yml:ro
-      - ./host_metrics_app/:/host_metrics_app/:ro
-    networks:
-      - elk
+      - ./docker/config/filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    user: root
     depends_on:
       - elasticsearch
 

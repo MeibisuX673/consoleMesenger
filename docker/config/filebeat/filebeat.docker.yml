@@ -1,0 +1,15 @@
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      templates:
+        - condition:
+            contains:
+              docker.container.name: db
+          config:
+            - type: container
+              paths:
+                - /var/lib/docker/containers/${data.docker.container.id}/*.log
+
+output.logstash:
+  #ip интерфейса eno1
+  hosts: ["192.168.11.119:5044"]

@@ -1,4 +1,4 @@
-- pipeline.id: service_stamped_json_logs
+- pipeline.id: service_stamped_tcp_logs
   pipeline.workers: 1
   pipeline.batch.size: 1
-  path.config: "/usr/share/logstash/config/pipelines/service_stamped_json_logs.conf"
+  path.config: "/usr/share/logstash/config/pipelines/service_stamped_fileBeat_logs.conf"
